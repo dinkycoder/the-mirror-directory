@@ -10,30 +10,50 @@ advisors reads it against that genre's rubric:
 | Agent | theme | marketability, hook, comparable films |
 | Director | world texture, dialogue, mirror device (bonus) | what plays on screen |
 | Historian | fiction in the gaps | fact versus invention, checked against the research notes |
-| Screenwriter | — | revision options, **only** when the writer asks a question |
+| Screenwriter | — | answers the writer's questions with revision options, from its own "Ask" button |
 
-The report opens with what already works, then the **top three priorities** for the next draft
-(biggest weighted gaps, each with the advisor's most important note), then the full scorecard and
-every advisor's notes. "Download notes" saves it as Markdown.
+**Get notes** runs the five critics. The report opens with what already works, then the **top three
+priorities** for the next draft (biggest weighted gaps, each with the advisor's most important note),
+then the full scorecard and every advisor's notes.
 
-Advisors give notes, not pages: none of them rewrites the script unless the writer asks the
-Screenwriter a question.
+**Ask the Screenwriter** has its own button below the report. It reads the same draft and, once
+notes exist, the notes too, so answers can build on them. It also works before any notes. A question
+takes well under a minute.
+
+"Download notes and answers" saves everything as Markdown. Nothing is stored on the server, so
+download before closing the page. Choosing a different draft starts fresh.
+
+Advisors give notes, not pages: none of them rewrites the script. The Screenwriter may sketch short,
+clearly labelled examples, but the choices are the writer's.
 
 ## Setup
 
 1. `npm install`
-2. Copy `.env.example` to `.env.local` and fill in `ANTHROPIC_API_KEY`, `APP_PASSWORD` and
+2. Copy `.env.example` to `.env.local` and fill in `ANTHROPIC_API_KEY`, `ACCESS_KEY` and
    `SESSION_SECRET` (for example `openssl rand -hex 32`).
-3. `npm run dev`, then open http://localhost:3000 and sign in with `APP_PASSWORD`.
+3. `npm run dev`, then open `http://localhost:3000/?key=<ACCESS_KEY>`.
 
 To deploy, import the repository into Vercel and set the same three environment variables.
-A review of a full script makes six Claude calls and can take a few minutes; the route allows up
-to 300 seconds.
+Getting notes makes five Claude calls and can take a few minutes; the routes allow up to 300 seconds.
+
+## Signing in: the private link
+
+There is no password. Send the writer one link and have them bookmark it:
+
+    https://<your-site>.vercel.app/?key=<ACCESS_KEY>
+
+Opening it signs that device in for a year and removes the key from the address bar. Anyone without
+the link is turned away. If the link leaks, change `ACCESS_KEY` in Vercel, redeploy, and send a new
+link; devices already signed in stay signed in until you also change `SESSION_SECRET`.
+(`APP_PASSWORD` from earlier versions still works as the key if `ACCESS_KEY` is not set. The sign-in
+page also accepts the code typed in, as a fallback.)
+
+Also set a monthly spend limit for the API key in the Claude Console, so cost is capped whatever happens.
 
 ## Privacy
 
-Scripts are processed in memory for one review and never stored by this app. The Claude API does not
-train on API inputs by default. There is a single password-protected login.
+Scripts are processed in memory for each request and never stored by this app. The Claude API does not
+train on API inputs by default. Only devices that opened the private link can use the site.
 
 ## Customizing
 
@@ -48,8 +68,9 @@ train on API inputs by default. There is a single password-protected login.
 
 - `lib/parse/` turns PDF, Fountain or Final Draft files into what Claude reads. PDFs go to Claude as
   documents with their real page numbers; Fountain and FDX are converted to text with estimated pages.
-- `lib/claude.ts` builds each advisor's request. The system prompt and script are identical for
-  every advisor, so the first call caches them and the rest read from cache. Responses use
+- `lib/claude.ts` builds each advisor's and the Screenwriter's request. The system prompt and script
+  are identical for all of them, so the first call caches them for an hour and later calls on the
+  same draft, including questions, read from cache. Responses use
   structured outputs, and refused requests fall back server-side to another model.
 - `lib/review.ts` runs the first advisor alone (to warm the cache), then the rest in parallel. One
   advisor failing does not sink the review.

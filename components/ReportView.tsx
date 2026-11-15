@@ -1,7 +1,7 @@
 "use client";
 
 import type { AdvisorNote } from "@/lib/advisors";
-import { advisorName, formatNoteLocation, reportToMarkdown } from "@/lib/export";
+import { advisorName, formatNoteLocation, reportToMarkdown, type QuestionAndAnswer } from "@/lib/export";
 import type { Report } from "@/lib/report";
 
 function Note({ note }: { note: AdvisorNote }) {
@@ -14,8 +14,10 @@ function Note({ note }: { note: AdvisorNote }) {
   );
 }
 
-function download(report: Report, meta: { title: string | null; filename: string }) {
-  const blob = new Blob([reportToMarkdown(report, meta)], { type: "text/markdown" });
+type Meta = { title: string | null; filename: string };
+
+function download(report: Report | null, meta: Meta, answers: QuestionAndAnswer[]) {
+  const blob = new Blob([reportToMarkdown(report, meta, answers)], { type: "text/markdown" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -24,7 +26,23 @@ function download(report: Report, meta: { title: string | null; filename: string
   URL.revokeObjectURL(url);
 }
 
-export default function ReportView({ report, meta }: { report: Report; meta: { filename: string; title: string | null; pages: number | null } }) {
+export function DownloadButton({ report, meta, answers }: { report: Report | null; meta: Meta; answers: QuestionAndAnswer[] }) {
+  return (
+    <button className="secondary" onClick={() => download(report, meta, answers)}>
+      {answers.length ? "Download notes and answers" : "Download notes"}
+    </button>
+  );
+}
+
+export default function ReportView({
+  report,
+  meta,
+  answers,
+}: {
+  report: Report;
+  meta: Meta & { pages: number | null };
+  answers: QuestionAndAnswer[];
+}) {
   return (
     <section aria-label="Notes">
       <div className="card">
@@ -37,7 +55,7 @@ export default function ReportView({ report, meta }: { report: Report; meta: { f
             <div><span className="score">{report.weightedScore}</span><span className="muted"> / 100</span></div>
           )}
         </div>
-        <button className="secondary" onClick={() => download(report, meta)}>Download notes</button>
+        <DownloadButton report={report} meta={meta} answers={answers} />
       </div>
 
       {report.failures.map((f) => (

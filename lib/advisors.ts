@@ -52,9 +52,9 @@ export const ADVISORS: Advisor[] = [
 
 export const CRITIC_IDS: AdvisorId[] = ["reader", "producer", "agent", "director", "historian"];
 
-export function selectAdvisors(writerQuestion: string | null): Advisor[] {
-  const ids = writerQuestion?.trim() ? [...CRITIC_IDS, "screenwriter"] : CRITIC_IDS;
-  return ids.map((id) => ADVISORS.find((a) => a.id === id)!);
+/** The advisors who run when the writer clicks "Get notes". The Screenwriter is asked separately. */
+export function criticAdvisors(): Advisor[] {
+  return CRITIC_IDS.map((id) => ADVISORS.find((a) => a.id === id)!);
 }
 
 export const AdvisorNoteSchema = z.object({
@@ -82,6 +82,24 @@ export const AdvisorResultSchema = z.object({
   logline: z.string().nullable().describe("Reader and Agent only; null for everyone else"),
 });
 export type AdvisorResult = z.infer<typeof AdvisorResultSchema>;
+
+export const ScreenwriterAnswerSchema = z.object({
+  answer: z.string().describe("A direct, plain-language answer to the writer's question, a short paragraph or two"),
+  options: z
+    .array(
+      z.object({
+        title: z.string().describe("A short name for this revision option"),
+        description: z.string().describe("What to change and why it would help"),
+        page: z.number().nullable().describe("The page this option mainly concerns, or null"),
+        example: z.string().nullable().describe("An optional short example beat or line, clearly an illustration, or null"),
+      }),
+    )
+    .describe("Two to four concrete revision options the writer can choose between; empty if the question does not call for options"),
+});
+export type ScreenwriterAnswer = z.infer<typeof ScreenwriterAnswerSchema>;
+
+/** Notes sent back to the Screenwriter are capped so a huge report cannot crowd out the script. */
+export const MAX_NOTES_CHARS = 40_000;
 
 /**
  * Identical for every advisor in a review, so the script (sent right after it) is cached once
@@ -118,18 +136,33 @@ export function buildSharedSystem(rubric: Rubric, research: string | null): stri
   ].join("\n");
 }
 
-export function buildAdvisorInstructions(advisor: Advisor, rubric: Rubric, writerQuestion: string | null): string {
+export function buildAdvisorInstructions(advisor: Advisor, rubric: Rubric): string {
   const owned = [...rubric.criteria, ...rubric.bonus].filter((c) => c.owner === advisor.id);
   const scoring = owned.length
     ? `Score exactly these criteria, and no others: ${owned.map((c) => c.id).join(", ")}.`
     : "You do not score any criteria; leave scores empty.";
 
-  const parts = [`You are the ${advisor.name}.`, advisor.brief, scoring];
-  if (advisor.id === "screenwriter") {
-    parts.push(`The writer asks: """${writerQuestion ?? ""}"""`);
-  } else {
-    parts.push("Do not rewrite the writer's pages; describe the problem and the direction of a fix.");
-  }
-  parts.push("Read the script above and respond in the required format.");
-  return parts.join("\n\n");
+  return [
+    `You are the ${advisor.name}.`,
+    advisor.brief,
+    scoring,
+    "Do not rewrite the writer's pages; describe the problem and the direction of a fix.",
+    "Read the script above and respond in the required format.",
+  ].join("\n\n");
+}
+
+export function buildScreenwriterInstructions(rubric: Rubric, question: string, notes: string | null): string {
+  const screenwriter = ADVISORS.find((a) => a.id === "screenwriter")!;
+  const trimmedNotes = notes?.trim() ? notes.trim().slice(0, MAX_NOTES_CHARS) : null;
+  return [
+    `You are the ${screenwriter.name}.`,
+    screenwriter.brief,
+    `Ground your answer in the ${rubric.label} rubric above and in specific pages of the script.`,
+    "Any example lines or beats must be short and clearly labelled as examples; the writer makes the choices and writes the pages.",
+    trimmedNotes
+      ? `The other advisors have already given these notes on this draft. Build on them where relevant, and say so when you disagree:\n"""\n${trimmedNotes}\n"""`
+      : "There are no notes yet from the other advisors; work from the script alone.",
+    `The writer asks:\n"""\n${question.trim()}\n"""`,
+    "Respond in the required format.",
+  ].join("\n\n");
 }

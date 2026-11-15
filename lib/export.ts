@@ -1,4 +1,4 @@
-import type { AdvisorNote } from "./advisors";
+import type { AdvisorNote, ScreenwriterAnswer } from "./advisors";
 import type { Report } from "./report";
 
 const NAMES: Record<string, string> = {
@@ -10,9 +10,34 @@ export function formatNoteLocation(note: AdvisorNote): string {
   return [note.page != null ? `p. ${note.page}` : null, note.scene].filter(Boolean).join(", ");
 }
 
-/** A plain Markdown copy of the report the writer can keep, print or share. */
-export function reportToMarkdown(report: Report, meta: { title: string | null; filename: string }): string {
+export interface QuestionAndAnswer {
+  question: string;
+  answer: ScreenwriterAnswer;
+}
+
+/** A plain Markdown copy of the notes and Screenwriter answers the writer can keep, print or share. */
+export function reportToMarkdown(
+  report: Report | null,
+  meta: { title: string | null; filename: string },
+  answers: QuestionAndAnswer[] = [],
+): string {
   const out: string[] = [`# Notes: ${meta.title ?? meta.filename}`, ""];
+  if (report) out.push(...reportSections(report));
+  if (answers.length) {
+    out.push("", "## Questions for the Screenwriter");
+    for (const qa of answers) {
+      out.push("", `### ${qa.question}`, "", qa.answer.answer);
+      for (const o of qa.answer.options) {
+        out.push("", `- **${o.title}**${o.page != null ? ` (p. ${o.page})` : ""}: ${o.description}`);
+        if (o.example) out.push(`  - _Example:_ ${o.example}`);
+      }
+    }
+  }
+  return out.join("\n").trim() + "\n";
+}
+
+function reportSections(report: Report): string[] {
+  const out: string[] = [];
   if (report.weightedScore != null) out.push(`Overall rubric score: **${report.weightedScore} / 100**`, "");
 
   out.push("## What's working", "");
@@ -40,5 +65,5 @@ export function reportToMarkdown(report: Report, meta: { title: string | null; f
   }
 
   for (const f of report.failures) out.push("", `> ${advisorName(f.advisorId)} could not finish: ${f.error}`);
-  return out.join("\n") + "\n";
+  return out;
 }

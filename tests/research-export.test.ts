@@ -44,4 +44,22 @@ describe("reportToMarkdown", () => {
     expect(md).toContain("68 / 100");
     expect(md).toContain("Agent could not finish: rate limited");
   });
+
+  it("includes the screenwriter's answers when there are any", () => {
+    const md = reportToMarkdown(report, { title: "The Black Consul", filename: "draft.pdf" }, [
+      { question: "How do I open?", answer: { answer: "Start in the cell.", options: [{ title: "Cold open", description: "Begin at Fort de Joux.", page: 1, example: null }] } },
+    ]);
+    expect(md).toContain("## Questions for the Screenwriter");
+    expect(md).toContain("How do I open?");
+    expect(md).toContain("Cold open");
+  });
+
+  it("works with answers alone, before any notes exist", () => {
+    const md = reportToMarkdown(null, { title: null, filename: "draft.pdf" }, [
+      { question: "Q?", answer: { answer: "A.", options: [] } },
+    ]);
+    expect(md).toContain("# Notes: draft.pdf");
+    expect(md).toContain("Q?");
+    expect(md).not.toContain("Scorecard");
+  });
 });

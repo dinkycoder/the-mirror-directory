@@ -17,6 +17,7 @@ export default async function Home() {
       <p className="lede">
         Upload a draft and a room of advisors (a Reader, Producer, Agent, Director and Historian) will give you notes against
         your genre's rubric, starting with what already works and ending with your top three priorities for the next draft.
+        Then ask the Screenwriter how to tackle them.
       </p>
       <ReviewForm genres={genres} research={research} />
     </main>
