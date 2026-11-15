@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createSessionToken, verifySessionToken, passwordMatches, getAccessKey, safeNextPath } from "@/lib/auth";
+import { createSessionToken, verifySessionToken, passwordMatches, getPassword } from "@/lib/auth";
 
 describe("session tokens", () => {
   it("verifies a token it signed", async () => {
@@ -16,9 +16,9 @@ describe("session tokens", () => {
     const token = await createSessionToken("secret", 1_000);
     const [issued, sig] = token.split(".");
     expect(await verifySessionToken(`${Number(issued) + 1}.${sig}`, "secret", 2_000)).toBe(false);
-    // The private link remembers a device for a year, so a 300-day-old session is still valid.
-    expect(await verifySessionToken(token, "secret", 1_000 + 300 * 24 * 3600 * 1000)).toBe(true);
-    expect(await verifySessionToken(token, "secret", 1_000 + 366 * 24 * 3600 * 1000)).toBe(false);
+    // Signing in with the password lasts 30 days on that device.
+    expect(await verifySessionToken(token, "secret", 1_000 + 29 * 24 * 3600 * 1000)).toBe(true);
+    expect(await verifySessionToken(token, "secret", 1_000 + 31 * 24 * 3600 * 1000)).toBe(false);
     expect(await verifySessionToken("garbage", "secret", 2_000)).toBe(false);
   });
 
@@ -29,20 +29,10 @@ describe("session tokens", () => {
   });
 });
 
-describe("private link", () => {
-  it("prefers ACCESS_KEY and falls back to APP_PASSWORD for existing deployments", () => {
-    expect(getAccessKey({ ACCESS_KEY: "k", APP_PASSWORD: "p" })).toBe("k");
-    expect(getAccessKey({ APP_PASSWORD: "p" })).toBe("p");
-    expect(getAccessKey({})).toBe("");
-  });
-
-  it("only redirects to paths on this site after signing in", () => {
-    expect(safeNextPath("/")).toBe("/");
-    expect(safeNextPath("/login")).toBe("/");
-    expect(safeNextPath("/notes?x=1")).toBe("/notes?x=1");
-    expect(safeNextPath("//evil.example")).toBe("/");
-    expect(safeNextPath("https://evil.example")).toBe("/");
-    expect(safeNextPath("/\\evil.example")).toBe("/");
-    expect(safeNextPath(null)).toBe("/");
+describe("password setting", () => {
+  it("uses APP_PASSWORD, and ACCESS_KEY for deployments set up during the private-link version", () => {
+    expect(getPassword({ APP_PASSWORD: "p", ACCESS_KEY: "k" })).toBe("p");
+    expect(getPassword({ ACCESS_KEY: "k" })).toBe("k");
+    expect(getPassword({})).toBe("");
   });
 });

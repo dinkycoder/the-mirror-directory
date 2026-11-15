@@ -63,4 +63,3 @@ th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--bord
 .qa { border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px; }
 .qa .question { color: var(--muted); }
 .example { margin: 4px 0 0; color: var(--muted); }
-details.card summary { cursor: pointer; font-weight: bold; }

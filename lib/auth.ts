@@ -1,18 +1,11 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
 export const SESSION_COOKIE = "mirror_session";
-/** The private link remembers a device for a year. */
-export const SESSION_MAX_AGE_MS = 365 * 24 * 3600 * 1000;
+export const SESSION_MAX_AGE_MS = 30 * 24 * 3600 * 1000;
 
-/** ACCESS_KEY is the code in the private link; APP_PASSWORD is still honoured for existing deployments. */
-export function getAccessKey(env: Record<string, string | undefined>): string {
-  return env.ACCESS_KEY || env.APP_PASSWORD || "";
-}
-
-/** Only same-site paths, so a crafted link cannot bounce the visitor to another website. */
-export function safeNextPath(next: string | null | undefined): string {
-  if (!next || !next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\") || next.startsWith("/login")) return "/";
-  return next;
+/** APP_PASSWORD is the sign-in password; ACCESS_KEY is honoured for deployments set up during the private-link version. */
+export function getPassword(env: Record<string, string | undefined>): string {
+  return env.APP_PASSWORD || env.ACCESS_KEY || "";
 }
 
 const encoder = new TextEncoder();

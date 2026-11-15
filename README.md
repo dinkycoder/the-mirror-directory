@@ -29,31 +29,26 @@ clearly labelled examples, but the choices are the writer's.
 ## Setup
 
 1. `npm install`
-2. Copy `.env.example` to `.env.local` and fill in `ANTHROPIC_API_KEY`, `ACCESS_KEY` and
+2. Copy `.env.example` to `.env.local` and fill in `ANTHROPIC_API_KEY`, `APP_PASSWORD` and
    `SESSION_SECRET` (for example `openssl rand -hex 32`).
-3. `npm run dev`, then open `http://localhost:3000/?key=<ACCESS_KEY>`.
+3. `npm run dev`, then open http://localhost:3000 and sign in with `APP_PASSWORD`.
 
 To deploy, import the repository into Vercel and set the same three environment variables.
 Getting notes makes five Claude calls and can take a few minutes; the routes allow up to 300 seconds.
 
-## Signing in: the private link
+## Signing in
 
-There is no password. Send the writer one link and have them bookmark it:
-
-    https://<your-site>.vercel.app/?key=<ACCESS_KEY>
-
-Opening it signs that device in for a year and removes the key from the address bar. Anyone without
-the link is turned away. If the link leaks, change `ACCESS_KEY` in Vercel, redeploy, and send a new
-link; devices already signed in stay signed in until you also change `SESSION_SECRET`.
-(`APP_PASSWORD` from earlier versions still works as the key if `ACCESS_KEY` is not set. The sign-in
-page also accepts the code typed in, as a fallback.)
+The writer signs in with `APP_PASSWORD`; each device stays signed in for 30 days. To change the
+password, change `APP_PASSWORD` in Vercel and redeploy. To sign out every device, also change
+`SESSION_SECRET`. (If only `ACCESS_KEY` is set, from the earlier private-link version, it is used as
+the password.)
 
 Also set a monthly spend limit for the API key in the Claude Console, so cost is capped whatever happens.
 
 ## Privacy
 
 Scripts are processed in memory for each request and never stored by this app. The Claude API does not
-train on API inputs by default. Only devices that opened the private link can use the site.
+train on API inputs by default. There is a single password-protected sign-in.
 
 ## Customizing
 
