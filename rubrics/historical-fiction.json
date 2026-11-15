@@ -1,0 +1,112 @@
+{
+  "id": "historical-fiction",
+  "label": "Historical Fiction",
+  "description": "Invented or embellished stories set against real history. Calibrated against Shakespeare in Love (Best Original Screenplay winner), Titanic, Gladiator, Braveheart, Saving Private Ryan, 1917, Inglourious Basterds and Amadeus.",
+  "criteria": [
+    {
+      "id": "personal-spine",
+      "name": "Personal spine",
+      "weight": 20,
+      "owner": "reader",
+      "description": "The film is about one person's want and need, with history as the pressure on them, not the plot itself. You can say it in one sentence about a person, not an era.",
+      "weak": "The story is a tour of the era; events happen and the lead reacts.",
+      "strong": "A clear protagonist whose want (external) and need (internal) drive every act, established early and shown in action."
+    },
+    {
+      "id": "fiction-in-the-gaps",
+      "name": "Fiction in the gaps",
+      "weight": 10,
+      "owner": "historian",
+      "description": "Invention goes where the historical record is silent (Shakespeare in Love invents Viola in Shakespeare's undocumented 1593). Real people stay consistent with the documented record; well-known facts are not contradicted without a clear dramatic reason.",
+      "weak": "Contradicts well-documented events or turns real figures into something the record does not support, with no purpose.",
+      "strong": "Invention sits in the gaps, real figures behave consistently with the record, and any deliberate license serves character or theme."
+    },
+    {
+      "id": "dramatic-irony",
+      "name": "Dramatic irony",
+      "weight": 10,
+      "owner": "reader",
+      "description": "The known outcome, or a secret the audience holds, becomes a source of tension and poignancy rather than a spoiler (Titanic's sinking; Will confiding his love for Viola to Viola disguised as Thomas).",
+      "weak": "The known outcome kills suspense, or the audience never knows more than the characters.",
+      "strong": "The audience is deliberately given knowledge a character lacks, and scenes play on that gap."
+    },
+    {
+      "id": "period-antagonist",
+      "name": "Period antagonist",
+      "weight": 10,
+      "owner": "reader",
+      "description": "The opposition is the period's social forces (class, law, church, empire, money, war) embodied in a specific person with practical motives. Shakespeare in Love's Wessex embodies class, money, royal consent and male ownership in one scene.",
+      "weak": "A generic villain whose evil is unmotivated, or no personified opposition at all.",
+      "strong": "A specific antagonist with understandable, period-rooted reasons, through whom the era itself pushes back."
+    },
+    {
+      "id": "theme",
+      "name": "Theme with modern resonance",
+      "weight": 10,
+      "owner": "agent",
+      "description": "The story speaks to today without giving characters 21st-century values unexplained. Shakespeare in Love's art-versus-commerce theme recurs in nearly every scene.",
+      "weak": "Preachy, absent, or carried by anachronistic speeches.",
+      "strong": "A question that matters now, dramatized through period-true choices and repeated across scenes."
+    },
+    {
+      "id": "world-texture",
+      "name": "World texture",
+      "weight": 10,
+      "owner": "director",
+      "description": "Period detail lives in action lines and behaviour (objects, work, manners), not lectures. Background is revealed through conflict, not explanation. Title cards are brief.",
+      "weak": "Exposition dumps, encyclopedia tone, or characters explaining history to each other.",
+      "strong": "Specific, lived-in detail shown on screen; backstory surfaces in arguments and choices."
+    },
+    {
+      "id": "dialogue",
+      "name": "Dialogue",
+      "weight": 10,
+      "owner": "director",
+      "description": "Period flavour through rhythm and image rather than archaic vocabulary; modern clarity; distinct voices. Anachronistic winks are rationed (at most one per scene) and deliberate.",
+      "weak": "Stilted thee-and-thou pastiche, or modern slang that breaks the period.",
+      "strong": "Short, clear, speakable lines with a period cadence; each character sounds like themselves."
+    },
+    {
+      "id": "convergence",
+      "name": "Convergence and ticking clocks",
+      "weight": 10,
+      "owner": "reader",
+      "description": "The private story and the historical event peak together, and dated deadlines create pressure ('two weeks from Saturday').",
+      "weak": "The personal story and the history run in parallel without touching; no deadlines.",
+      "strong": "Specific deadlines drive the middle, and the personal and historical climaxes collide."
+    },
+    {
+      "id": "ending",
+      "name": "Ending",
+      "weight": 5,
+      "owner": "reader",
+      "description": "History wins, but the character gets an emotional resolution. The ending is earned and true to the period (Viola leaves; the love survives as Twelfth Night).",
+      "weak": "Rewrites history for comfort, or stops without emotional resolution.",
+      "strong": "Bittersweet, earned, and faithful to what history allows."
+    },
+    {
+      "id": "producibility",
+      "name": "Producibility",
+      "weight": 5,
+      "owner": "producer",
+      "description": "Period films are expensive (costume, crowds, ships, battles, locations). Scale is used sparingly and contained scenes carry the story.",
+      "weak": "Large battles, crowds or sea scenes on most pages; the story only works at epic budget.",
+      "strong": "A contained core (a few key locations) with spectacle saved for moments that matter."
+    }
+  ],
+  "bonus": [
+    {
+      "id": "mirror-device",
+      "name": "Mirror device",
+      "weight": 0,
+      "owner": "director",
+      "description": "A story-within-the-story (a rehearsal, trial, letter, ceremony, battle plan) echoes the main plot, as Shakespeare in Love's rehearsals of Romeo and Juliet mirror Will and Viola's romance.",
+      "weak": "No inner story, or one that does not reflect the main plot.",
+      "strong": "An inner story that comments on and propels the main story."
+    }
+  ],
+  "passFail": [
+    { "id": "format", "name": "Industry format", "description": "Scene headings, action, character cues and dialogue in standard screenplay format." },
+    { "id": "length", "name": "Length", "description": "Roughly 90 to 120 pages for a feature." }
+  ]
+}
